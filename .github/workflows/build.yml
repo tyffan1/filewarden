@@ -1,0 +1,62 @@
+name: Build apps
+
+on:
+  workflow_dispatch:
+  push:
+    tags: ["v*"]
+
+jobs:
+  windows:
+    name: Windows (.exe)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build FileWarden.exe and filewarden-cli.exe
+        run: python packaging/build_app.py --with-dnd --cli
+      - name: Smoke test the binaries
+        shell: pwsh
+        run: |
+          & "dist/filewarden-cli.exe" --version
+          if ($LASTEXITCODE -ne 0) { throw "filewarden-cli.exe --version failed" }
+          & "dist/filewarden-cli.exe" --help > $null
+          if ($LASTEXITCODE -ne 0) { throw "filewarden-cli.exe --help failed" }
+          $gui = Start-Process -FilePath "dist/FileWarden.exe" -ArgumentList "--check" -PassThru
+          if (-not $gui.WaitForExit(60000)) {
+            $gui.Kill()
+            throw "FileWarden.exe --check timed out"
+          }
+          if ($gui.ExitCode -ne 0) { throw "FileWarden.exe --check failed: $($gui.ExitCode)" }
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FileWarden-windows
+          path: |
+            dist/FileWarden.exe
+            dist/filewarden-cli.exe
+          if-no-files-found: error
+
+  linux:
+    name: Linux (binary)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tkinter
+        run: sudo apt-get update && sudo apt-get install -y python3-tk python3-venv
+      - name: Build FileWarden and filewarden-cli
+        run: python3 packaging/build_app.py --with-dnd --cli
+      - name: Smoke test the binaries
+        run: |
+          ./dist/filewarden-cli --version
+          ./dist/filewarden-cli --help > /dev/null
+          xvfb-run -a ./dist/FileWarden --check
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: FileWarden-linux
+          path: |
+            dist/FileWarden
+            dist/filewarden-cli
+          if-no-files-found: error

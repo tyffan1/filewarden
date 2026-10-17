@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "filewarden"
+version = "0.1.0"
+description = "Hash-first VirusTotal scanner for files and folders (CLI + tkinter GUI)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "tyffan1" }]
+keywords = ["virustotal", "security", "scanner", "sha256", "malware"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Environment :: X11 Applications :: Tk",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Topic :: Security",
+]
+
+[project.optional-dependencies]
+# Drag & drop support for the GUI; everything else is standard library only.
+dnd = ["tkinterdnd2>=0.4.2"]
+
+[project.scripts]
+filewarden = "fwl.cli:main"
+filewarden-gui = "fwl.gui:main"
+
+[tool.setuptools]
+packages = ["fwl"]
