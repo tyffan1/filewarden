@@ -32,8 +32,13 @@ possible only as an explicit opt-in — the `--upload always` flag or a GUI sett
 
 ## Installation
 
-The easiest path is to put the `filewarden` and `filewarden-gui` commands on your
-PATH with pipx, so that a scan is just `filewarden ~/Downloads`:
+Prefer no Python at all? The
+[Releases](https://github.com/tyffan1/filewarden/releases) page has prebuilt
+binaries — `FileWarden.exe` for Windows, a Linux binary and a macOS `.app`.
+Download and run.
+
+The easiest Python path is to put the `filewarden` and `filewarden-gui` commands
+on your PATH with pipx, so that a scan is just `filewarden ~/Downloads`:
 
 ```console
 pipx install --editable .    # code edits take effect immediately, no reinstall
